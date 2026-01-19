@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client" //import the auth client
 import { on } from "events";
+import { redirect } from "next/dist/server/api-utils";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ export default function Home() {
   const onLogin = () => {
     authClient.signIn.email({
       email,
-      password
+      password,
     }, {
       onSuccess: () => {
           //redirect to the dashboard or sign in page
