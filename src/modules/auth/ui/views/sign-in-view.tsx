@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from 'next/navigation';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { OctagonAlertIcon } from 'lucide-react'; // Added icon
 import { 
   Form, 
   FormControl, 
@@ -36,8 +38,8 @@ export const SignInView = () => {
     const form = useForm<z.infer<typeof signInSchema>>({
         resolver: zodResolver(signInSchema),
         defaultValues: {
-        email: "",
-        password: "",
+            email: "",
+            password: "",
         },
   });
 
@@ -130,7 +132,7 @@ export const SignInView = () => {
                     <FormItem>
                       <div className="flex items-center justify-between">
                         <FormLabel>Password</FormLabel>
-                        <Button variant="link" size="sm" className="px-0 font-normal text-green-700 hover:text-green-800">
+                        <Button variant="link" size="sm" className="px-0 font-normal text-green-700 hover:text-green-800" onClick={() => router.push("/forgot-password")}>
                           Forgot password?
                         </Button>
                       </div>
@@ -147,8 +149,20 @@ export const SignInView = () => {
                 </Button>
               </form>
             </Form>
+            
+            <div className="mt-4">
+            {error && (
+                <Alert variant="destructive" className="mb-6 animate-in fade-in slide-in-from-top-2" key={error}>
+                <OctagonAlertIcon className="h-4 w-4" /> {/* Add an icon for visibility */}
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                    {error}
+                </AlertDescription>
+                </Alert>
+            )}
+            </div>
 
-            <div className="mt-8 text-center text-sm text-slate-600">
+            <div className="mt-4 text-center text-sm text-slate-600">
               Don&apos;t have an account?{" "}
               <Link 
                 href="/sign-up" 
