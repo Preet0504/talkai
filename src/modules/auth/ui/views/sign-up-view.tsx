@@ -53,7 +53,7 @@ export const SignUpView = () => {
     },
     {
       onSuccess: () => {
-        router.push("/");
+        router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
       },
       onError: ({ error }) => {
         setError(error.message || "An error occurred during sign up.");
