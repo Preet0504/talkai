@@ -5,9 +5,8 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Chrome, Github } from 'lucide-react'; // Added icons
-
+import { router } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -29,9 +28,9 @@ const signUpSchema = z.object({
 });
 
 export const SignUpView = () => {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false); // Added loading state
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -50,9 +49,11 @@ export const SignUpView = () => {
       name: data.name,
       email: data.email,
       password: data.password,
+      callbackURL: `/verify-email?email=${encodeURIComponent(data.email)}`,
     },
     {
       onSuccess: () => {
+        setLoading(false);
         router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
       },
       onError: ({ error }) => {
