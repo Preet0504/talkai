@@ -1,0 +1,41 @@
+// src/app/(dashboard)/layout.tsx
+"use client";
+
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { DashboardSidebar } from "@/components/ui/dashboard-sidebar";
+import { authClient } from "@/lib/auth-client";
+
+const handleSignOut = async () => {
+  await authClient.signOut({
+    fetchOptions: {
+        onSuccess: () => {
+            window.location.href = "/sign-in";
+        },
+    },
+  });
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+    const { data: session } = authClient.useSession();
+  return (
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-slate-50/50"> 
+        <DashboardSidebar 
+        user= {[session?.user?.name || "John Doe", session?.user?.email || "john@example.com"]}
+        onLogOut={handleSignOut} />
+        <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* Header area for the toggle button */}
+          <header className="flex h-16 items-center border-b bg-white px-6">
+            <SidebarTrigger className="text-slate-500 hover:text-green-700" />
+            <div className="ml-4 h-4 w-[1px] bg-slate-200" />
+            <span className="ml-4 font-semibold text-slate-700">Talk.AI Dashboard</span>
+          </header>
+          
+          <div className="flex-1 overflow-auto p-6">
+            {children}
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
+  );
+}

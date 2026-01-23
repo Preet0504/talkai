@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import { z } from 'zod';
+import { set, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -33,8 +33,9 @@ const signInSchema = z.object({
 
 
 export const SignInView = () => {
-    const router = useRouter();
     const [error, setError] = useState<string | null>(null);
+    const [pending, setPending] = useState(false);
+    const router = useRouter();
     const form = useForm<z.infer<typeof signInSchema>>({
         resolver: zodResolver(signInSchema),
         defaultValues: {
@@ -45,31 +46,38 @@ export const SignInView = () => {
 
     const onSubmit = async (data: z.infer<typeof signInSchema>) => {
         setError(null);
-
+        setPending(true);
         authClient.signIn.email({
             email: data.email,
             password: data.password,
+            callbackURL: "/",
         },
         {
             onSuccess: () => {
+                setPending(false);
                 router.push("/");
             },
             onError: ({ error }) => {
                 setError(error.message);
+                setPending(false);
             }
         }
     );
     };
 
     const handleSocialSignIn = async(provider: 'google' | 'github') => {
+        setError(null);
+        setPending(true);
         console.log(`Signing in with ${provider}`);
         // authClient.signIn.social({ provider });
-        authClient.signIn.social({ provider }, {
+        authClient.signIn.social({ provider, callbackURL: "/" }, {
           onSuccess: () => {
+            setPending(false);
             router.push("/");
           },
           onError: ({ error }) => {
             setError(error.message);
+            setPending(false);
           }
         });
     };
@@ -89,7 +97,7 @@ export const SignInView = () => {
 
             {/* Social Buttons Section */}
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <Button variant="outline" className="w-full" onClick={() => handleSocialSignIn('google')}>
+              <Button disabled={pending} variant="outline" className="w-full" onClick={() => handleSocialSignIn('google')}>
                 <Chrome className="mr-2 h-4 w-4" />
                 Google
               </Button>
@@ -144,7 +152,7 @@ export const SignInView = () => {
                   )}
                 />
 
-                <Button type="submit" className="w-full bg-green-700 hover:bg-green-800" size="lg">
+                <Button disabled={pending} type="submit" className="w-full bg-green-700 hover:bg-green-800" size="lg">
                   Sign In
                 </Button>
               </form>
