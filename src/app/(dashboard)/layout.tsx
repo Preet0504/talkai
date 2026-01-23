@@ -4,6 +4,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/ui/dashboard-sidebar";
 import { authClient } from "@/lib/auth-client";
+import { DashboardNavbar } from "@/components/ui/dashboard-navbar";
 
 const handleSignOut = async () => {
   await authClient.signOut({
@@ -27,8 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Header area for the toggle button */}
           <header className="flex h-16 items-center border-b bg-white px-6">
             <SidebarTrigger className="text-slate-500 hover:text-green-700" />
-            <div className="ml-4 h-4 w-[1px] bg-slate-200" />
-            <span className="ml-4 font-semibold text-slate-700">Talk.AI Dashboard</span>
+            <DashboardNavbar />
           </header>
           
           <div className="flex-1 overflow-auto p-6">
