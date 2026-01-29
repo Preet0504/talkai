@@ -122,4 +122,19 @@
   body {
     @apply bg-background text-foreground;
   }
+  @keyframes progress-slide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .animate-progress {
+    animation: progress-slide 2s infinite linear;
+  }
+  @keyframes subtle-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+  }
+  .animate-shake {
+    animation: subtle-shake 0.2s ease-in-out font-medium;
+  }
 }
