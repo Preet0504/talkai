@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 import {
-  CommandDialog,
+  CommandResponsiveDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -64,7 +64,7 @@ export function DashboardSearch() {
       </button>
 
       {/* 3. The Actual Pop-up Dialog */}
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandResponsiveDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
@@ -92,7 +92,7 @@ export function DashboardSearch() {
             </CommandItem>
           </CommandGroup>
         </CommandList>
-      </CommandDialog>
+      </CommandResponsiveDialog>
     </>
   );
 }
