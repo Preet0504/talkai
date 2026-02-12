@@ -14,7 +14,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-// import { GeneratedAvatar } from "@/components/generated-avatar"
+import { GeneratedAvatar } from "@/components/generated-avatar"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -37,7 +37,15 @@ export const AgentForm = ({
     const queryClient = useQueryClient();
     const createAgent = useMutation({
         ...trpc.agents.create.mutationOptions({
-            onSuccess: () => {},
+            onSuccess: async () => {
+            // This is the magic line. Replace 'list' with whatever your 
+            // main query is named in your tRPC router (e.g., getMany, list, etc.)
+            await queryClient.invalidateQueries({
+                queryKey: trpc.agents.getMany.queryKey(),
+            });
+            
+            onSuccess(); // Close the modal/form
+            },
             onError: () => {}
         })
     });
@@ -66,7 +74,7 @@ export const AgentForm = ({
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* <GeneratedAvatar seed={form.watch("name")} className="w-24 h-24 rounded-full" /> */}
+                <GeneratedAvatar seed={form.watch("name")} className="w-24 h-24 rounded-full" />
                 <FormField
                     control={form.control}
                     name="name"
