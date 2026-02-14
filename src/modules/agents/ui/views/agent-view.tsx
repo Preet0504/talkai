@@ -1,51 +1,64 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useSuspenseQuery } from "@tanstack/react-query";
+
 import { useTRPC } from "@/trpc/client";
-import { LoadingState } from "@/components/loading-state";
-import { ErrorState } from "@/components/error-state";
-import { DataTable } from "../components/data-table";
-import { columns } from "../components/columns";
+import { DataTable } from "@/modules/agents/ui/components/data-table";
 import { EmptyState } from "@/components/empty-state";
+import { ErrorState } from "@/components/error-state";
+import { LoadingState } from "@/components/loading-state";
 
-export const AgentView = () => {
-    const trpc = useTRPC();
-    const { data } = useSuspenseQuery(trpc.agents.getMany.queryOptions());
-    
-    if (!data || data.length === 0) {
-        return <AgentEmptyState />;
-    }
+import { columns } from "../components/columns";
+import { DataPagination } from "../components/data-pagination";
+import { useAgentsFilters } from "../../hooks/use-agents-filters";
 
-    return (
-        <div className="flex-1 pb-4 px-4 md:px-8 flex flex-col gap-y-4">
-            <DataTable data={data} columns={columns}/>
-        </div>
-    );
-}
+export const AgentsView = () => {
+  const router = useRouter();
+  const [filters, setFilters] = useAgentsFilters();
 
-export const AgentLoadingState = () => (
-    <LoadingState 
-        title="Loading Agents" 
-        message="Fetching agents from the server." 
+  const trpc = useTRPC();
+  const { data } = useSuspenseQuery(
+    trpc.agents.getMany.queryOptions({
+      ...filters,
+    }));
+
+  return (
+    <div className="flex-1 pb-4 px-4 md:px-8 flex flex-col gap-y-4">
+      <DataTable
+        data={data.items}
+        columns={columns}
+        onRowClick={(row) => router.push(`/agents/${row.id}`)}
+      />
+      <DataPagination 
+        page={filters.page}
+        totalPages={data.totalPages}
+        onPageChange={(page) => setFilters({page})}
+      />
+      {data.items.length === 0 && (
+        <EmptyState
+          title="Create your first agent"
+          message="Create an agent to join your meetings. Each agent will follow your instructions and can interact with participants during the call."
+        />
+      )}
+    </div>
+  );
+};
+
+export const AgentsViewLoading = () => {
+  return (
+    <LoadingState
+      title="Loading Agents"
+      message="This may take a fews seconds"
     />
-);
+  );
+};
 
-export const AgentEmptyState = () => (
-    EmptyState({
-        title: "No Agents Found",
-        message: "You haven't created any AI agents yet. Create one to start automating your meetings.",
-        actionLabel: "Create Agent",
-        onAction: () => {
-            // This should trigger the new agent creation flow, e.g., open a modal
-            console.log("Create Agent button clicked");
-        }
-    })
-);
-
-export const AgentErrorState = ({ onRetry }: { onRetry: () => void }) => (
-    <ErrorState 
-        title="Failed to Load Agents"
-        message="There was an error fetching agents. Please try again."
-        onRetry={onRetry}
+export const AgentsViewError = () => {
+  return (
+    <ErrorState
+      title="Error Loading Agents"
+      message=" Somthing went wrong"
     />
-);
+  );
+};
