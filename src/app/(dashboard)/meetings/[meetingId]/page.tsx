@@ -7,9 +7,9 @@ import { getQueryClient, trpc } from "@/trpc/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import {
   MeetingIdView,
-  MeetingIdViewErrorState,
+  MeetingIdViewError,
   MeetingIdViewLoading,
-} from "@/modules/meetings/views/meeting-id-view";
+} from "@/modules/meetings/ui/views/meeting-id-view";
 
 interface Props {
   params: Promise<{
@@ -36,7 +36,7 @@ const MeetingIdPage = async ({ params }: Props) => {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Suspense fallback={<MeetingIdViewLoading />}>
-        <ErrorBoundary fallback={<MeetingIdViewErrorState />}>
+        <ErrorBoundary fallback={<MeetingIdViewError />}>
           <MeetingIdView meetingId={meetingId} />
         </ErrorBoundary>
       </Suspense>

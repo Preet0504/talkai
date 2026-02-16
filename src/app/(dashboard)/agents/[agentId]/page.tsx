@@ -5,9 +5,9 @@ import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { getQueryClient, trpc } from "@/trpc/server";
 import {
   AgentIdView,
-  AgentsIdViewErrorState,
-  AgentsIdViewLoading,
-} from "@/modules/agents/views/agent-id-view";
+  AgentIdViewError,
+  AgentIdViewLoading,
+} from "@/modules/agents/ui/views/agent-id-view";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -32,8 +32,8 @@ const Page = async ({ params }: Props) => {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<AgentsIdViewLoading />}>
-        <ErrorBoundary fallback={<AgentsIdViewErrorState />}>
+      <Suspense fallback={<AgentIdViewLoading />}>
+        <ErrorBoundary fallback={<AgentIdViewError />}>
           <AgentIdView agentId={agentId} />
         </ErrorBoundary>
       </Suspense>
