@@ -1,13 +1,20 @@
-import { initTRPC, TRPCError } from '@trpc/server';
-import { headers } from 'next/headers';
-import { cache } from 'react';
-import { auth } from '@/lib/auth';
-import { se } from 'date-fns/locale';
+import { db } from "@/db";
+import { agents, meetings } from "@/db/schema";
+import { auth } from "@/lib/auth";
+import { polarClient } from "@/lib/polar";
+import {
+  MAX_FREE_AGENTS,
+  MAX_FREE_MEETINGS,
+} from "@/modules/premium/constants";
+import { initTRPC, TRPCError } from "@trpc/server";
+import { count, eq } from "drizzle-orm";
+import { headers } from "next/headers";
+import { cache } from "react";
 export const createTRPCContext = cache(async () => {
   /**
    * @see: https://trpc.io/docs/server/context
    */
-  return { userId: 'user_123' };
+  return { userId: "user_123" };
 });
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
@@ -27,11 +34,9 @@ export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-
-  if (!session){
-    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You must be logged in to access this resource' });
+  if (!session) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "Unauthorized" });
   }
-
   return next({
     ctx: {
       ...ctx,
@@ -39,3 +44,49 @@ export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
     },
   });
 });
+
+
+export const premiumProcedure = (entity: "meetings" | "agents") =>
+  protectedProcedure.use(async ({ ctx, next }) => {
+    const customer = await polarClient.customers.getStateExternal({
+      externalId: ctx.auth.user.id,
+    });
+
+    const [userMeetings] = await db
+      .select({ count: count(meetings.id) })
+      .from(meetings)
+      .where(eq(meetings.userId, ctx.auth.user.id));
+
+    const [userAgents] = await db
+      .select({ count: count(agents.id) })
+      .from(agents)
+      .where(eq(agents.userId, ctx.auth.user.id));
+
+    // TODO: Add logics to prevent abuse such as user is deleting the agents and meetings and again trying to create new ones -- as this logic is only checking for counts
+    
+    const isPremium = customer.activeSubscriptions.length > 0;
+    const isFreeAgentLimitReached = userAgents.count >= MAX_FREE_AGENTS;
+    const isFreeMeetingLimitReached = userMeetings.count >= MAX_FREE_MEETINGS;
+
+    const shouldThrowAgentError =
+      entity === "agents" && isFreeAgentLimitReached && !isPremium;
+
+    const shouldThrowMeetingError =
+      entity === "meetings" && isFreeMeetingLimitReached && !isPremium;
+
+    if (shouldThrowAgentError) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You have reached the maximum number of free agents",
+      });
+    }
+
+    if (shouldThrowMeetingError) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You have reached the maximum number of free meetings",
+      });
+    }
+
+    return next({ ctx: { ...ctx, customer } });
+  });

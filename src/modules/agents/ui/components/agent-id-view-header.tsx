@@ -8,19 +8,19 @@ import {
 
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuContent,
-} from "@/components/ui/dropdown-menu";
-
-import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Props {
   agentId: string;
@@ -36,12 +36,12 @@ export const AgentIdViewHeader = ({
   onRemove,
 }: Props) => {
   return (
-    <div className="flex justify-between">
+    <div className="flex items-center justify-between">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild className="font-medium text-xl">
-              <Link href="/agents">My Agents</Link>
+              <Link href="/agents">Agents</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator className="text-foreground text-xl font-medium [&>svg]:size-4">
@@ -57,20 +57,22 @@ export const AgentIdViewHeader = ({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      {/* without modal={false}, the dialog that this dropdown opens cause the website to get unclickable */}
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost">
+          <Button variant="ghost" aria-label="Open agent actions">
             <MoreVerticalIcon />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={onEdit}>
+          <DropdownMenuItem onClick={onEdit} className="cursor-pointer">
             <PencilIcon className="size-4 text-black" />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={onRemove}>
-            <TrashIcon className="size-4 text-black" />
+          <DropdownMenuItem
+            onClick={onRemove}
+            className="text-red-500 hover:text-red-600 focus:text-red-600 hover:bg-red-50 focus:bg-red-50 cursor-pointer"
+          >
+            <TrashIcon className="size-4 text-red-500" />
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
