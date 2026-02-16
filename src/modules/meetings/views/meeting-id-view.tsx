@@ -13,11 +13,11 @@ import {
 } from "@tanstack/react-query";
 import { useConfirm } from "@/modules/agents/hooks/use-confirm";
 import { MeetingIdViewHeader } from "../ui/components/meeting-id-view-header";
-import { UpdateMeetingDilaog } from "../ui/components/update-meeting-dialog";
+import { UpdateMeetingDialog } from "../ui/components/update-meeting-dialog";
 import { UpcomingState } from "../ui/components/upcoming-state";
 import { ActiveState } from "../ui/components/active-state";
 import { CancelledState } from "../ui/components/cancelled-state";
-import { ProcesingState } from "../ui/components/processing-state";
+import { ProcessingState } from "../ui/components/processing-state";
 import { CompletedState } from "../ui/components/completed-state";
 
 interface Props {
@@ -74,7 +74,7 @@ export const MeetingIdView = ({ meetingId }: Props) => {
   return (
     <>
       <RemoveConfirmation />
-      <UpdateMeetingDilaog
+      <UpdateMeetingDialog
         open={updateMeetingDialogOpen}
         onOpenChange={setUpdateMeetingDialogOpen}
         initialValues={data}
@@ -94,7 +94,7 @@ export const MeetingIdView = ({ meetingId }: Props) => {
           />
         )}
         {isCancelled && <CancelledState />}
-        {isProcessing && <ProcesingState />}
+        {isProcessing && <ProcessingState />}
         {isCompleted && <CompletedState data={data}/>}
       </div>
     </>
