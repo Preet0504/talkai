@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getQueryClient, trpc } from "@/trpc/server";
-import { CallView } from "@/modules/call/ui/view/call-view";
+import { CallView } from "@/modules/call/ui/views/call-view";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 interface Props {

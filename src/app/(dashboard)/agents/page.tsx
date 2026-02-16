@@ -4,9 +4,9 @@ import { loadSearchParams } from "@/modules/agents/params";
 import { AgentsListHeader } from "@/modules/agents/ui/components/agents-list-header";
 import {
   AgentsView,
-  AgentsViewErrorState,
+  AgentsViewError,
   AgentsViewLoading,
-} from "@/modules/agents/views/agent-view";
+} from "@/modules/agents/ui/views/agent-view";
 
 import { Suspense } from "react";
 import { SearchParams } from "nuqs";
@@ -38,7 +38,7 @@ const Agents = async ({ searchParams }: Props) => {
       <AgentsListHeader />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense fallback={<AgentsViewLoading />}>
-          <ErrorBoundary fallback={<AgentsViewErrorState />}>
+          <ErrorBoundary fallback={<AgentsViewError />}>
             <AgentsView />
           </ErrorBoundary>
         </Suspense>
