@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { KeyRound, Loader2 } from "lucide-react";
 
-export const ResetPasswordView = () => {
-  const searchParams = new URLSearchParams(window.location.search);
+// 1. Move the logic into a sub-component
+const ResetPasswordForm = () => {
+  const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
 
   const [password, setPassword] = useState("");
@@ -18,13 +19,20 @@ export const ResetPasswordView = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Redirect or show error if token is missing (after mount)
   if (!token) {
-    alert("Reset token is missing. Please request a new link.");
-    return;
+    return (
+      <div className="text-center p-4">
+        <p className="text-red-500 font-medium">Reset token is missing.</p>
+        <Button variant="link" onClick={() => router.push("/sign-in")}>
+          Back to Sign In
+        </Button>
+      </div>
+    );
   }
 
   const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault(); // Added to prevent page reload
+    e.preventDefault();
     
     if (password !== confirmPassword) {
       alert("Passwords do not match");
@@ -47,7 +55,51 @@ export const ResetPasswordView = () => {
   };
 
   return (
-    /* 1. This wrapper is the magic fix for centering */
+    <form onSubmit={handleUpdate} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="password">New Password</Label>
+        <Input 
+          id="password"
+          type="password" 
+          placeholder="••••••••"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="confirm">Confirm New Password</Label>
+        <Input 
+          id="confirm"
+          type="password" 
+          placeholder="••••••••"
+          required
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+      </div>
+
+      <Button 
+        type="submit" 
+        className="w-full bg-green-700 hover:bg-green-800"
+        disabled={loading || !password}
+      >
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Updating...
+          </>
+        ) : "Reset Password"}
+      </Button>
+    </form>
+  );
+};
+
+// 2. Wrap the whole view in Suspense
+// Next.js requires Suspense when using useSearchParams in static builds
+export const ResetPasswordView = () => {
+  return (
     <div className="flex min-h-screen w-full items-center justify-center bg-slate-50 p-4">
       <Card className="w-full max-w-md shadow-xl border-none">
         <CardContent className="p-8">
@@ -61,45 +113,13 @@ export const ResetPasswordView = () => {
             </p>
           </div>
 
-          {/* 2. Using a form tag allows 'Enter' key to submit */}
-          <form onSubmit={handleUpdate} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <Input 
-                id="password"
-                type="password" 
-                placeholder="••••••••"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+          <Suspense fallback={
+            <div className="flex justify-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirm">Confirm New Password</Label>
-              <Input 
-                id="confirm"
-                type="password" 
-                placeholder="••••••••"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-
-            <Button 
-              type="submit" 
-              className="w-full bg-green-700 hover:bg-green-800"
-              disabled={loading || !password}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
-                </>
-              ) : "Reset Password"}
-            </Button>
-          </form>
+          }>
+            <ResetPasswordForm />
+          </Suspense>
         </CardContent>
       </Card>
     </div>
