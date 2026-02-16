@@ -1,16 +1,16 @@
 import { z } from "zod";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
+import { MeetingGetOne } from "../../types";
+import { meetingsInsertSchema } from "../../schemas";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CommandSelect } from "@/components/command-select";
-import { GeneratedAvatar } from "@/components/generated-avatar";
 import {
   Form,
   FormControl,
@@ -20,10 +20,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import { MeetingGetOne } from "../../types";
-import { meetingsInsertSchema } from "../../schemas";
-import { NewAgentDialog } from "@/modules/agents/ui/components/new-agent-dialog";
+import { CommandSelect } from "@/components/command-select";
+import { GeneratedAvatar } from "@/components/generated-avatar";
+import { NewAgentsDialog } from "@/modules/agents/ui/components/new-agent-dialog";
+import { useRouter } from "next/navigation";
 
 interface MeetingFormProps {
   onSuccess?: (id?: string) => void;
@@ -37,16 +37,29 @@ export const MeetingForm = ({
   initialValues,
 }: MeetingFormProps) => {
   const trpc = useTRPC();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const [openNewAgentDialog, setOpenNewAgentDialog] = useState(false);
   const [agentSearch, setAgentSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(agentSearch);
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [agentSearch]);
 
   const agents = useQuery(
     trpc.agents.getMany.queryOptions({
       pageSize: 100,
-      search: agentSearch,
-    }),
+      search: debouncedSearch,
+    })
   );
 
   const createMeeting = useMutation(
@@ -55,35 +68,40 @@ export const MeetingForm = ({
         await queryClient.invalidateQueries(
           trpc.meetings.getMany.queryOptions({})
         );
-        // TODO: Invalidate free tier usage
+        await queryClient.invalidateQueries(
+          trpc.premium.getFreeUsage.queryOptions()
+        );
         onSuccess?.(data.id);
       },
       onError: (error) => {
         toast.error(error.message);
-        //TODO : Check if error code is "FORBIDDEN", redirect to "/upgrade"
+        if (error.data?.code === "FORBIDDEN") {
+          router.push("/upgrade");
+        }
       },
-    }),
+    })
   );
 
   const updateMeeting = useMutation(
     trpc.meetings.update.mutationOptions({
-      onSuccess: async (data) => {
+      onSuccess: async () => {
         await queryClient.invalidateQueries(
           trpc.meetings.getMany.queryOptions({})
         );
+
         if (initialValues?.id) {
           await queryClient.invalidateQueries(
             trpc.meetings.getOne.queryOptions({ id: initialValues.id })
           );
         }
-        onSuccess?.(data.id);
+        onSuccess?.();
       },
       onError: (error) => {
         toast.error(error.message);
-        //TODO : Check if error code is "FORBIDDEN", redirect to "/upgrade"
       },
-    }),
+    })
   );
+
   const form = useForm<z.infer<typeof meetingsInsertSchema>>({
     resolver: zodResolver(meetingsInsertSchema),
     defaultValues: {
@@ -91,7 +109,6 @@ export const MeetingForm = ({
       agentId: initialValues?.agentId ?? "",
     },
   });
-
   const isEdit = !!initialValues?.id;
   const isPending = createMeeting.isPending || updateMeeting.isPending;
 
@@ -105,7 +122,10 @@ export const MeetingForm = ({
 
   return (
     <>
-      <NewAgentDialog open={ openNewAgentDialog } onOpenChange={setOpenNewAgentDialog} />
+      <NewAgentsDialog
+        open={openNewAgentDialog}
+        onOpenChange={setOpenNewAgentDialog}
+      />
       <Form {...form}>
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <FormField
@@ -115,13 +135,12 @@ export const MeetingForm = ({
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="eg. Math Consultations" />
+                  <Input {...field} placeholder="e.g: Project Consultant" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
           <FormField
             name="agentId"
             control={form.control}
@@ -147,7 +166,15 @@ export const MeetingForm = ({
                     onSelect={field.onChange}
                     onSearch={setAgentSearch}
                     value={field.value}
-                    placeholder="Select an agent"
+                    placeholder="Search an agent"
+                    isLoading={
+                      agents.isLoading || agentSearch !== debouncedSearch
+                    }
+                    emptyMessage={
+                      agentSearch && !agents.isLoading
+                        ? `No agents found for "${agentSearch}"`
+                        : "No agents found"
+                    }
                   />
                 </FormControl>
                 <FormDescription>
