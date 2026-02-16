@@ -38,7 +38,7 @@ export const AgentsView = () => {
       {data.items.length === 0 && (
         <EmptyState
           title="Create your first agent"
-          message="Create an agent to join your meetings. Each agent will follow your instructions and can interact with participants during the call."
+          description="Create an agent to join your meetings. Each agent will follow your instructions and can interact with participants during the call."
         />
       )}
     </div>
@@ -49,7 +49,7 @@ export const AgentsViewLoading = () => {
   return (
     <LoadingState
       title="Loading Agents"
-      message="This may take a fews seconds"
+      description="This may take a fews seconds"
     />
   );
 };
@@ -58,7 +58,7 @@ export const AgentsViewError = () => {
   return (
     <ErrorState
       title="Error Loading Agents"
-      message=" Somthing went wrong"
+      description=" Somthing went wrong"
     />
   );
 };

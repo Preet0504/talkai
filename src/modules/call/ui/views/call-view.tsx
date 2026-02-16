@@ -19,7 +19,7 @@ interface Props{
             <div className="flex h-screen items-center justify-between">
                 <ErrorState 
                 title="Meeting has ended"
-                message="You can no longer join this meeting" />
+                description="You can no longer join this meeting" />
             </div>
         )
     }

@@ -29,7 +29,7 @@ export const MeetingsView= ()=>{
              {data.items.length === 0 && (
                     <EmptyState
                       title="Create your first meeting"
-                      message="Schedule a meeting to connect with others .Each meeting lets you collaborate ,share ideas , and interact with participants in real time."
+                      description="Schedule a meeting to connect with others .Each meeting lets you collaborate ,share ideas , and interact with participants in real time."
                     />
                   )}
         </div>
@@ -40,7 +40,7 @@ export const MeetingsViewLoading=()=>{
     return(
         <LoadingState
         title="Loading Meetings"
-        message="This may take a few seconds" />
+        description="This may take a few seconds" />
 
     )
 }
@@ -49,7 +49,7 @@ export const MeetingsViewError=()=>{
     return(
         <ErrorState
       title="Error Loading Meetings"
-      message="Something went wrong"
+      description="Something went wrong"
     />
     )
 }

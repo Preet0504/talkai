@@ -85,7 +85,6 @@ export const MeetingIdView = ({ meetingId }: Props) => {
           {isUpcoming && (
             <UpcomingState
               meetingId={meetingId}
-              onCancelMeeting={() => {}}
               isCancelling={false}
             />
           )}
@@ -98,7 +97,7 @@ export const MeetingIdViewLoading = () => {
     return (
         <LoadingState
             title="Loading Meeting"
-            message="This may take a few seconds"
+            description="This may take a few seconds"
         />
     )
 }
@@ -106,7 +105,7 @@ export const MeetingIdViewError = () => {
     return (
         <ErrorState
             title="Error Loading Meeting"
-            message="Please try again later"
+            description="Please try again later"
         />
     );
 };

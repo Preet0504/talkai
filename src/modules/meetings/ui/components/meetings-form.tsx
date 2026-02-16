@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import { CommandSelect } from "@/components/command-select";
-import { NewAgentDialog } from "@/modules/agents/ui/components/new-agent-dialog";
+import { NewAgentsDialog } from "@/modules/agents/ui/components/new-agent-dialog";
 
 interface MeetingFormProps {
   onSuccess?: (id?: string) => void;
@@ -103,7 +103,7 @@ export const MeetingForm = ({
   };
   return (
     <>
-    <NewAgentDialog open={openNewAgentDialog} onOpenChange={setOpenNewAgentDialog}/>
+    <NewAgentsDialog open={openNewAgentDialog} onOpenChange={setOpenNewAgentDialog}/>
     <Form {...form}>
       <form className="space-y-4" onSubmit={form.handleSubmit(onsubmit)}>
         <FormField
