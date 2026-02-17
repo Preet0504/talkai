@@ -9,7 +9,7 @@
     "lint": "eslint",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "dev:webhook": "ngrok http http://localhost:3000"
+    "dev:webhook": "ngrok http https://talkai-ruby.vercel.app/"
   },
   "dependencies": {
     "@dicebear/collection": "^9.3.1",
