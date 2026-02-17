@@ -108,7 +108,13 @@ export async function POST(req: NextRequest) {
       });
 
       realtimeClient.updateSession({
-        instructions: existingAgent.instructions,
+        instructions: existingAgent.instructions || "You are a helpful assistant.",
+        voice: "alloy",             // Choices: alloy, echo, shimmer, ash, ballad, coral, sage, verse
+        modalities: ["audio", "text"], // Must include 'audio' for the agent to talk
+        input_audio_format: "pcm16",
+        output_audio_format: "pcm16",
+        input_audio_transcription: { model: "whisper-1" },
+        turn_detection: { type: "server_vad" },
       });
     } catch (error) {
       return NextResponse.json(
