@@ -20,6 +20,16 @@ import {
 import { GeneratedAvatar } from "@/components/generated-avatar";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useSound } from "@/components/sound/sound-provider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { AgentMediaPanel } from "./agent-media-panel";
+import { OPENAI_VOICES } from "@/modules/media/constants";
 
 interface AgentFormProps {
   onSuccess?: () => void;
@@ -35,6 +45,7 @@ export const AgentForm = ({
   const trpc = useTRPC();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { play } = useSound();
 
   const createAgent = useMutation(
     trpc.agents.create.mutationOptions({
@@ -45,10 +56,12 @@ export const AgentForm = ({
         await queryClient.invalidateQueries(
           trpc.premium.getFreeUsage.queryOptions()
         );
+        play("success");
         onSuccess?.();
       },
       onError: (error) => {
         toast.error(error.message);
+        play("error");
         if (error.data?.code === "FORBIDDEN") {
           router.push("/upgrade");
         }
@@ -68,10 +81,12 @@ export const AgentForm = ({
             trpc.agents.getOne.queryOptions({ id: initialValues.id })
           );
         }
+        play("success");
         onSuccess?.();
       },
       onError: (error) => {
         toast.error(error.message);
+        play("error");
       },
     })
   );
@@ -81,6 +96,10 @@ export const AgentForm = ({
     defaultValues: {
       name: initialValues?.name ?? "",
       instructions: initialValues?.instructions ?? "",
+      voiceProvider: initialValues?.voiceProvider ?? "openai",
+      voiceId: initialValues?.voiceId ?? "alloy",
+      voiceModelId: initialValues?.voiceModelId ?? null,
+      consentAccepted: initialValues?.consentAccepted ?? false,
     },
   });
   const isEdit = !!initialValues?.id;
@@ -96,7 +115,7 @@ export const AgentForm = ({
 
   return (
     <Form {...form}>
-      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
         <GeneratedAvatar
           seed={form.watch("name")}
           variant="botttsNeutral"
@@ -131,6 +150,83 @@ export const AgentForm = ({
             </FormItem>
           )}
         />
+
+        <div className="rounded-lg border border-border/60 p-4 space-y-4">
+          <div>
+            <p className="text-sm font-semibold">Live Voice</p>
+            <p className="text-xs text-muted-foreground">
+              Select the realtime voice used in meetings. Voice samples are
+              processed separately below.
+            </p>
+          </div>
+          <FormField
+            name="voiceProvider"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Provider</FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value ?? "openai"}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select provider" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="openai">OpenAI Realtime</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="voiceId"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Voice</FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value ?? "alloy"}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select voice" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {OPENAI_VOICES.map((voice) => (
+                        <SelectItem key={voice} value={voice}>
+                          {voice}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {isEdit ? (
+          <AgentMediaPanel
+            agentId={initialValues.id}
+            consentAccepted={form.watch("consentAccepted") ?? false}
+            onConsentChange={(value) =>
+              form.setValue("consentAccepted", value, {
+                shouldDirty: true,
+              })
+            }
+          />
+        ) : (
+          <div className="rounded-lg border border-dashed border-border/70 p-4 text-sm text-muted-foreground">
+            Create the agent first to unlock voice samples and face assets.
+          </div>
+        )}
+
         <div className="flex justify-between gap-x-2">
           {onCancel && (
             <Button

@@ -5,7 +5,7 @@ import { createAgent, openai, TextMessage } from "@inngest/agent-kit";
 
 import { db } from "@/db";
 import { eq, inArray } from "drizzle-orm";
-import { agents, meetings, user } from "@/db/schema";
+import { agents, mediaUploads, meetings, user } from "@/db/schema";
 
 // AI agent that converts raw transcripts into structured markdown summaries
 const summarizer = createAgent({
@@ -118,5 +118,83 @@ export const meetingsProcessing = inngest.createFunction(
         })
         .where(eq(meetings.id, event.data.meetingId));
     });
+  }
+);
+
+/**
+ * AGENT MEDIA PROCESSING PIPELINE
+ *
+ * Triggered after an upload is stored. Performs lightweight validation,
+ * assigns quality scores, and marks processing status as ready.
+ * This is a placeholder for provider-specific processing (normalization,
+ * avatar generation, etc.).
+ */
+export const agentMediaProcessing = inngest.createFunction(
+  { id: "agents/media-processing" },
+  { event: "agents/media.process" },
+  async ({ event, step }) => {
+    const { uploadId, agentId, kind } = event.data as {
+      uploadId: string;
+      agentId: string;
+      kind: "voice_sample" | "face_image" | "face_video";
+    };
+
+    const [upload] = await step.run("load-upload", async () => {
+      return db
+        .select()
+        .from(mediaUploads)
+        .where(eq(mediaUploads.id, uploadId));
+    });
+
+    if (!upload) {
+      return { status: "missing" };
+    }
+
+    await step.run("mark-processing", async () => {
+      await db
+        .update(mediaUploads)
+        .set({ status: "processing", updatedAt: new Date() })
+        .where(eq(mediaUploads.id, uploadId));
+    });
+
+    if (kind === "voice_sample") {
+      await step.run("process-voice", async () => {
+        const durationScore = upload.durationSec
+          ? Math.min(100, Math.max(60, 100 - Math.abs(upload.durationSec - 25)))
+          : 70;
+        await db
+          .update(agents)
+          .set({
+            voiceProcessingStatus: "ready",
+            voiceProcessingError: null,
+            voiceQualityScore: durationScore,
+            updatedAt: new Date(),
+          })
+          .where(eq(agents.id, agentId));
+      });
+    }
+
+    if (kind === "face_image" || kind === "face_video") {
+      await step.run("process-face", async () => {
+        await db
+          .update(agents)
+          .set({
+            faceProcessingStatus: "ready",
+            faceProcessingError: null,
+            faceQualityScore: 80,
+            updatedAt: new Date(),
+          })
+          .where(eq(agents.id, agentId));
+      });
+    }
+
+    await step.run("mark-ready", async () => {
+      await db
+        .update(mediaUploads)
+        .set({ status: "ready", updatedAt: new Date() })
+        .where(eq(mediaUploads.id, uploadId));
+    });
+
+    return { status: "ok" };
   }
 );

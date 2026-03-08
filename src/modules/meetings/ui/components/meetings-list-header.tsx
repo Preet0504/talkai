@@ -32,8 +32,13 @@ export const MeetingsListHeader = () => {
     <>
       <NewMeetingDilaog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
       <div className="p-4 md:px-8 flex flex-col gap-y-4">
-        <div className="flex items-center justify-between">
-          <h5 className="font-medium text-xl">My Meetings</h5>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-1">
+            <h5 className="text-2xl font-semibold font-display">Meetings</h5>
+            <p className="text-sm text-muted-foreground">
+              Schedule, track, and review AI-led sessions.
+            </p>
+          </div>
           <Button
             onClick={() => {
               setIsDialogOpen(true);
@@ -44,7 +49,7 @@ export const MeetingsListHeader = () => {
           </Button>
         </div>
         <ScrollArea>
-          <div className="flex items-center gap-x-2 p-1">
+          <div className="flex items-center gap-x-2 rounded-lg border border-border/60 bg-card/60 p-2">
             <MeetingsSearchFilter />
             <StatusFilter />
             <AgentIdFilter />

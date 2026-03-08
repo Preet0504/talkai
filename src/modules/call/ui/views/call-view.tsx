@@ -16,7 +16,7 @@ interface Props{
 
     if(data.status ==="completed"){
         return(
-            <div className="flex h-screen items-center justify-between">
+            <div className="flex h-screen items-center justify-center bg-radial from-sidebar-accent to-sidebar">
                 <ErrorState 
                 title="Meeting has ended"
                 description="You can no longer join this meeting" />
@@ -24,6 +24,6 @@ interface Props{
         )
     }
     return(
-        <CallProvider meetingId={meetingId} meetingName={data.name} />
+        <CallProvider meetingId={meetingId} meetingName={data.name} agent={data.agent} />
     )
  }

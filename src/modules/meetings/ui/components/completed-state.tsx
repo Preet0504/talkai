@@ -26,7 +26,7 @@ export const CompletedState = ({ data }: Props) => {
   return (
     <div className="flex flex-col gap-y-4">
       <Tabs defaultValue="summary">
-        <div className="bg-white rounded-lg border px-3">
+        <div className="bg-card rounded-lg border border-border/60 px-3 shadow-elevated">
           <ScrollArea>
             <TabsList className="p-0 bg-background justify-start rounded-none h-13">
               <TabsTrigger
@@ -74,7 +74,7 @@ export const CompletedState = ({ data }: Props) => {
         </TabsContent>
         <TabsContent value="recording">
           {/* recordings are stored in stream right now in the same reason of your application, so it will be automatically deleted after 2 weeks -- it can also be stored in the aws s3 and all */}
-          <div className="bg-white rounded-lg border px-4 py-5">
+          <div className="bg-card rounded-lg border border-border/60 px-4 py-5 shadow-elevated">
             <video
               src={data.recordingUrl!}
               className="w-full rounded-lg"
@@ -83,7 +83,7 @@ export const CompletedState = ({ data }: Props) => {
           </div>
         </TabsContent>
         <TabsContent value="summary">
-          <div className="bg-white rounded-lg border">
+          <div className="bg-card rounded-lg border border-border/60 shadow-elevated">
             <div className="px-4 py-5 gap-y-4 flex flex-col col-span-5">
               <h2 className="text-2xl font-medium capitalize">{data.name}</h2>
               <div className="flex gap-x-2 items-center">
@@ -143,10 +143,10 @@ export const CompletedState = ({ data }: Props) => {
                       <strong className="font-medium" {...props} />
                     ),
                     code: (props) => (
-                      <code
-                        className="bg-gray-100 px-1 py-0.5 rounded"
-                        {...props}
-                      />
+                    <code
+                      className="bg-muted px-1 py-0.5 rounded"
+                      {...props}
+                    />
                     ),
                     blockquote: (props) => (
                       <blockquote

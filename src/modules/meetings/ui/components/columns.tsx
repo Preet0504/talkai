@@ -26,11 +26,16 @@ const statusIconMap = {
 };
 
 const statusColorMap = {
-  upcoming: "bg-yellow-500/20 text-yellow-800 border-yellow-800",
-  active: "bg-blue-500/20 text-blue-800 border-blue-800",
-  completed: "bg-emerald-500/20 text-emerald-800 border-emerald-800",
-  processing: "bg-rose-500/20 text-rose-800 border-rose-800",
-  cancelled: "bg-gray-500/20 text-gray-800 border-gray-800",
+  upcoming:
+    "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-200",
+  active:
+    "bg-sky-500/15 text-sky-700 border-sky-500/30 dark:text-sky-200",
+  completed:
+    "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-200",
+  processing:
+    "bg-violet-500/15 text-violet-700 border-violet-500/30 dark:text-violet-200",
+  cancelled:
+    "bg-rose-500/15 text-rose-700 border-rose-500/30 dark:text-rose-200",
 };
 
 export const columns: ColumnDef<MeetingGetMany[number]>[] = [
@@ -70,7 +75,7 @@ export const columns: ColumnDef<MeetingGetMany[number]>[] = [
       return (
         <Badge
           className={cn(
-            "capitalize [$svg]:size-4 text-muted-foreground",
+            "capitalize [&>svg]:size-4 text-muted-foreground",
             statusColorMap[row.original.status as keyof typeof statusColorMap]
           )}
         >
@@ -90,9 +95,9 @@ export const columns: ColumnDef<MeetingGetMany[number]>[] = [
     cell: ({ row }) => (
       <Badge
         variant={"outline"}
-        className={cn("capitalize [$svg]:size-4 flex items-center gap-x-2")}
+        className={cn("capitalize [&>svg]:size-4 flex items-center gap-x-2")}
       >
-        <ClockFadingIcon className="text-blue-700" />
+        <ClockFadingIcon className="text-primary" />
         {row.original.duration
           ? formatDuration(row.original.duration)
           : "No duration"}

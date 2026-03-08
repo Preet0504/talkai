@@ -1,3 +1,5 @@
+"use client";
+
 import { z } from "zod";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
@@ -24,6 +26,7 @@ import { CommandSelect } from "@/components/command-select";
 import { GeneratedAvatar } from "@/components/generated-avatar";
 import { NewAgentsDialog } from "@/modules/agents/ui/components/new-agent-dialog";
 import { useRouter } from "next/navigation";
+import { useSound } from "@/components/sound/sound-provider";
 
 interface MeetingFormProps {
   onSuccess?: (id?: string) => void;
@@ -39,6 +42,7 @@ export const MeetingForm = ({
   const trpc = useTRPC();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { play } = useSound();
 
   const [openNewAgentDialog, setOpenNewAgentDialog] = useState(false);
   const [agentSearch, setAgentSearch] = useState("");
@@ -71,10 +75,12 @@ export const MeetingForm = ({
         await queryClient.invalidateQueries(
           trpc.premium.getFreeUsage.queryOptions()
         );
+        play("success");
         onSuccess?.(data.id);
       },
       onError: (error) => {
         toast.error(error.message);
+        play("error");
         if (error.data?.code === "FORBIDDEN") {
           router.push("/upgrade");
         }
@@ -94,10 +100,12 @@ export const MeetingForm = ({
             trpc.meetings.getOne.queryOptions({ id: initialValues.id })
           );
         }
+        play("success");
         onSuccess?.();
       },
       onError: (error) => {
         toast.error(error.message);
+        play("error");
       },
     })
   );

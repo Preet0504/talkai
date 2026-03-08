@@ -15,8 +15,10 @@ import { inngest } from "@/inngest/client";
 import { db } from "@/db";
 import { agents, meetings } from "@/db/schema";
 import { streamVideo } from "@/lib/stream-video";
-import { generateAvatarUri } from "@/lib/avatar";
 import { streamChat } from "@/lib/stream-chat";
+import { generateAvatarUri } from "@/lib/avatar";
+import { resolveAgentAvatar } from "@/modules/agents/engines/avatar-engine";
+import { joinRealtimeAgent } from "@/modules/agents/engines/realtime-agent-engine";
 
 const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -98,23 +100,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Agent not found!" }, { status: 404 });
     }
 
+    const resolvedAvatar = resolveAgentAvatar({
+      id: existingAgent.id,
+      name: existingAgent.name,
+      faceThumbnailUrl: existingAgent.faceThumbnailUrl,
+      faceImageUrl: existingAgent.faceImageUrl,
+      faceVideoUrl: existingAgent.faceVideoUrl,
+      faceAnimationMode: existingAgent.faceAnimationMode,
+      faceProcessingStatus: existingAgent.faceProcessingStatus,
+    });
+
     // now we join the agent to the meeting
     try {
-      const call = streamVideo.video.call("default", meetingId);
-      const realtimeClient = await streamVideo.video.connectOpenAi({
-        call,
-        openAiApiKey: process.env.OPENAI_API_KEY!,
-        agentUserId: existingAgent.id,
-      });
+      await streamVideo.upsertUsers([
+        {
+          id: existingAgent.id,
+          name: existingAgent.name,
+          role: "user",
+          image: resolvedAvatar.imageUrl,
+        },
+      ]);
 
-      realtimeClient.updateSession({
-        instructions: existingAgent.instructions || "You are a helpful assistant.",
-        voice: "alloy",             // Choices: alloy, echo, shimmer, ash, ballad, coral, sage, verse
-        modalities: ["audio", "text"], // Must include 'audio' for the agent to talk
-        input_audio_format: "pcm16",
-        output_audio_format: "pcm16",
-        input_audio_transcription: { model: "whisper-1" },
-        turn_detection: { type: "server_vad" },
+      const start = Date.now();
+      const { voiceSession } = await joinRealtimeAgent(existingAgent, meetingId);
+      const latencyMs = Date.now() - start;
+
+      console.info("talkai.agent.realtime.joined", {
+        meetingId,
+        agentId: existingAgent.id,
+        voice: voiceSession.voice,
+        provider: voiceSession.provider,
+        latencyMs,
       });
     } catch (error) {
       return NextResponse.json(

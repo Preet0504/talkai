@@ -8,11 +8,11 @@ interface Props {
 
 export const DataPagination = ({ page, totalPages, onPageChange }: Props) => {
   return (
-    <div className="flex items-center justify-center">
-      <div className="flex-1 text-sm text-muted-foreground">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="text-sm text-muted-foreground">
         Page {page} of {totalPages || 1}
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-end space-x-2 py-2">
         <Button
           disabled={page === 1}
           variant="outline"

@@ -13,7 +13,7 @@ export const UpcomingState = ({
   isCancelling,
 }: Props) => {
   return (
-    <div className="bg-white rounded-lg px-4 py-5 flex flex-col gap-y-8 items-center justify-center">
+    <div className="bg-card rounded-lg border border-border/60 px-4 py-5 flex flex-col gap-y-8 items-center justify-center shadow-elevated">
       <EmptyState
         image="/upcoming.svg"
         title="Not started yet"

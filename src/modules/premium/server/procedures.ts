@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { polarClient } from "@/lib/polar";
 import { agents, meetings } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure, baseProcedure } from "@/trpc/init";
+import { TRPCError } from "@trpc/server";
 
 import { eq, count } from "drizzle-orm";
 
@@ -22,12 +23,28 @@ export const premiumRouter = createTRPCRouter({
     return product;
   }),
   getProducts: baseProcedure.query(async () => {
-    const products = await polarClient.products.list({
-      isArchived: false,
-      isRecurring: true,
-      sorting: ["price_amount"],
-    });
-    return products.result.items;
+    if (!process.env.POLAR_ACCESS_TOKEN) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: "POLAR_ACCESS_TOKEN is missing.",
+      });
+    }
+
+    try {
+      const products = await polarClient.products.list({
+        isArchived: false,
+        isRecurring: true,
+        sorting: ["price_amount"],
+      });
+      return products.result.items;
+    } catch (error) {
+      console.error("premium.getProducts failed", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message:
+          "Failed to load premium products. Check Polar credentials and server mode.",
+      });
+    }
   }),
   getFreeUsage: protectedProcedure.query(async ({ ctx }) => {
     const customer = await polarClient.customers.getStateExternal({

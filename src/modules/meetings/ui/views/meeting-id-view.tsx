@@ -8,6 +8,8 @@ import { useTRPC } from "@/trpc/client";
 import { useConfirm } from "@/hooks/use-confirm";
 import { ErrorState } from "@/components/error-state";
 import { LoadingState } from "@/components/loading-state";
+import { useSound } from "@/components/sound/sound-provider";
+import { toast } from "sonner";
 
 import { ActiveState } from "../components/active-state";
 import { UpcomingState } from "../components/upcoming-state";
@@ -25,6 +27,7 @@ export const MeetingIdView = ({ meetingId }: Props) => {
     const trpc = useTRPC();
     const router = useRouter();
     const queryClient = useQueryClient();
+    const { play } = useSound();
 
     const [UpdateMeetingDialogOpen, setUpdateMeetingDialogOpen] = useState(false);
 
@@ -42,7 +45,12 @@ export const MeetingIdView = ({ meetingId }: Props) => {
             onSuccess: () => {
                 queryClient.invalidateQueries(trpc.meetings.getMany.queryOptions({}));
                 // TODO: Invalidate free tier usage
+                play("success");
                 router.push("/meetings");
+            },
+            onError: (error) => {
+                toast.error(error.message);
+                play("error");
             },
         })
     );

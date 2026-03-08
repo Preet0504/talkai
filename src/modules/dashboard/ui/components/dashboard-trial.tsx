@@ -18,7 +18,7 @@ export const DashboardTrial = () => {
   if (!data) return null;
 
   return (
-    <div className="border border-border/10 rounded-lg w-full bg-white/5 flex flex-col gap-y-2">
+    <div className="border border-border/10 rounded-lg w-full bg-foreground/5 flex flex-col gap-y-2">
       <div className="p-3 flex flex-col gap-y-4">
         <div className="flex items-center gap-2">
           <RocketIcon className="size-4" />
@@ -38,7 +38,7 @@ export const DashboardTrial = () => {
         </div>
         <Button
           asChild
-          className="bg-transparent border-t border-border/10 hover:bg-white/10 rounded-t-none"
+          className="bg-transparent border-t border-border/10 hover:bg-foreground/10 rounded-t-none"
         >
           <Link href={"/upgrade"}>Upgrade</Link>
         </Button>

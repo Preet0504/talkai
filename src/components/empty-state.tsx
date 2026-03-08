@@ -26,16 +26,16 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center py-12 px-4 text-center ${className}`}
+      className={`flex flex-col items-center justify-center gap-6 rounded-lg border border-border/60 bg-card/60 px-6 py-12 text-center shadow-elevated ${className}`}
     >
       {useImage ? (
-        <Image src={image} alt="Empty" width={240} height={240} />
+        <Image src={image} alt="Empty" width={220} height={220} />
       ) : Icon ? (
         <Icon className="h-12 w-12 text-muted-foreground mb-4" />
       ) : null}
 
-      <div className="flex flex-col gap-y-6 mx-auto text-center">
-        <h6 className="text-lg font-medium">{title}</h6>
+      <div className="flex flex-col gap-y-4 mx-auto text-center max-w-md">
+        <h6 className="text-lg font-medium font-display">{title}</h6>
         <p className="text-sm text-muted-foreground">{description}</p>
         {action && <Button onClick={action.onClick}>{action.label}</Button>}
       </div>

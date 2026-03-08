@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import {
   Navbar,
   NavBody,
@@ -29,8 +30,8 @@ export const HomeNavbar = () => {
       <NavBody className="py-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity relative z-30">
-          <Image src="/logo.svg" alt="Meet AI Logo" width={32} height={32} />
-          <span className="text-xl font-semibold text-foreground">Meet AI</span>
+          <Image src="/logo.svg" alt="TalkAI Logo" width={32} height={32} />
+          <span className="text-xl font-semibold font-display text-foreground">TalkAI</span>
         </Link>
 
         {/* Navigation Items */}
@@ -38,6 +39,7 @@ export const HomeNavbar = () => {
 
         {/* Auth Buttons */}
         <div className="flex items-center gap-4 relative z-30">
+          <ThemeSwitcher />
           {!isPending && session?.user ? (
             <Button asChild>
               <Link href="/meetings">Dashboard</Link>
@@ -59,8 +61,8 @@ export const HomeNavbar = () => {
       <MobileNav className="py-4">
         <MobileNavHeader>
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Image src="/logo.svg" alt="Meet AI Logo" width={32} height={32} />
-            <span className="text-xl font-semibold text-foreground">Meet AI</span>
+            <Image src="/logo.svg" alt="TalkAI Logo" width={32} height={32} />
+            <span className="text-xl font-semibold font-display text-foreground">TalkAI</span>
           </Link>
           <MobileNavToggle
             isOpen={mobileMenuOpen}

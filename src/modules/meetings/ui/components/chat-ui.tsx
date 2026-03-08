@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useId } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Channel as StreamChannel } from "stream-chat";
@@ -12,6 +14,7 @@ import {
 } from "stream-chat-react";
 import { useTRPC } from "@/trpc/client";
 import { LoadingState } from "@/components/loading-state";
+import { useSound } from "@/components/sound/sound-provider";
 
 import "stream-chat-react/dist/css/v2/index.css";
 
@@ -35,6 +38,7 @@ export const ChatUI = ({
     trpc.meetings.generateChatToken.mutationOptions()
   );
   const [channel, setChannel] = useState<StreamChannel>();
+  const { play } = useSound();
 
   const client = useCreateChatClient({
     apiKey: process.env.NEXT_PUBLIC_STREAM_CHAT_API_KEY!,
@@ -55,6 +59,19 @@ export const ChatUI = ({
     setChannel(channel);
   }, [client, meetingId, meetingName, userId]);
 
+  useEffect(() => {
+    if (!client) return;
+    const handleMessage = (event: { user?: { id?: string } }) => {
+      if (event.user?.id && event.user.id !== userId) {
+        play("notify");
+      }
+    };
+    client.on("message.new", handleMessage);
+    return () => {
+      client.off("message.new", handleMessage);
+    };
+  }, [client, userId, play]);
+
   if (!client)
     return (
       <LoadingState
@@ -64,7 +81,7 @@ export const ChatUI = ({
     );
 
   return (
-    <div className="bg-white rounded-lg border overflow-hidden">
+    <div className="bg-card rounded-lg border border-border/60 overflow-hidden shadow-elevated">
       <Chat client={client}>
         <Channel channel={channel}>
           <Window>

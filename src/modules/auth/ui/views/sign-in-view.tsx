@@ -105,13 +105,13 @@ export const SignInView = () => {
                 <div className="flex md:hidden flex-col items-center justify-center gap-2 mb-4">
                   <Image
                     src="/logo.svg"
-                    alt="Meet AI Logo"
+                    alt="TalkAI Logo"
                     className="h-[60px] w-[60px]"
                     width={60}
                     height={60}
                   />
                   <p className="text-xl font-semibold text-green-700">
-                    Meet AI
+                    TalkAI
                   </p>
                 </div>
 
@@ -275,12 +275,12 @@ export const SignInView = () => {
           <div className="bg-gradient-to-br from-sidebar-accent to-sidebar relative hidden md:flex flex-col items-center justify-center gap-y-4">
             <Image
               src="/logo.svg"
-              alt="Meet AI Logo"
+              alt="TalkAI Logo"
               className="h-[92px] w-[92px]"
               width={92}
               height={92}
             />
-            <p className="text-2xl font-semibold text-white">Meet AI</p>
+            <p className="text-2xl font-semibold text-white">TalkAI</p>
           </div>
         </CardContent>
       </Card>

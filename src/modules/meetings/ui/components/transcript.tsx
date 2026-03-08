@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { format } from "date-fns";
 import { SearchIcon } from "lucide-react";
@@ -35,7 +37,7 @@ export const Transcript = ({ meetingId }: Props) => {
   }
 
   return (
-    <div className="bg-white rounded-lg border px-4 py-5 flex flex-col gap-y-4 w-full">
+    <div className="bg-card rounded-lg border border-border/60 px-4 py-5 flex flex-col gap-y-4 w-full shadow-elevated">
       <p className="text-sm font-medium">Transcript</p>
       <div className="relative">
         <Input

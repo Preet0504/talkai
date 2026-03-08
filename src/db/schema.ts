@@ -1,5 +1,12 @@
 import { nanoid } from "nanoid";
-import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  pgEnum,
+  integer,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -9,6 +16,23 @@ export const user = pgTable("user", {
     .$defaultFn(() => false)
     .notNull(),
   image: text("image"),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const userPreferences = pgTable("user_preferences", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  soundEnabled: boolean("sound_enabled").notNull().default(false),
+  soundVolume: integer("sound_volume").notNull().default(60),
+  mediaFeaturesEnabled: boolean("media_features_enabled")
+    .notNull()
+    .default(false),
   createdAt: timestamp("created_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
@@ -61,6 +85,40 @@ export const verification = pgTable("verification", {
   ),
 });
 
+export const mediaProcessingStatus = pgEnum("media_processing_status", [
+  "pending",
+  "processing",
+  "ready",
+  "failed",
+]);
+
+export const mediaUploadStatus = pgEnum("media_upload_status", [
+  "pending",
+  "uploaded",
+  "processing",
+  "ready",
+  "failed",
+  "deleted",
+]);
+
+export const mediaUploadKind = pgEnum("media_upload_kind", [
+  "voice_sample",
+  "face_image",
+  "face_video",
+]);
+
+export const faceSourceType = pgEnum("face_source_type", [
+  "image",
+  "video",
+  "generated",
+]);
+
+export const faceAnimationMode = pgEnum("face_animation_mode", [
+  "static",
+  "lip-sync",
+  "realtime-avatar",
+]);
+
 export const agents = pgTable("agents", {
   id: text("id")
     .primaryKey()
@@ -70,6 +128,24 @@ export const agents = pgTable("agents", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   instructions: text("instructions").notNull(),
+  voiceProvider: text("voice_provider"),
+  voiceId: text("voice_id"),
+  voiceModelId: text("voice_model_id"),
+  sampleAudioUrl: text("sample_audio_url"),
+  sampleAudioDurationSec: integer("sample_audio_duration_sec"),
+  sampleAudioMime: text("sample_audio_mime"),
+  voiceQualityScore: integer("voice_quality_score"),
+  voiceProcessingStatus: mediaProcessingStatus("voice_processing_status"),
+  voiceProcessingError: text("voice_processing_error"),
+  faceSourceType: faceSourceType("face_source_type"),
+  faceImageUrl: text("face_image_url"),
+  faceVideoUrl: text("face_video_url"),
+  faceThumbnailUrl: text("face_thumbnail_url"),
+  faceAnimationMode: faceAnimationMode("face_animation_mode"),
+  faceQualityScore: integer("face_quality_score"),
+  faceProcessingStatus: mediaProcessingStatus("face_processing_status"),
+  faceProcessingError: text("face_processing_error"),
+  consentAccepted: boolean("consent_accepted").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -99,6 +175,32 @@ export const meetings = pgTable("meetings", {
   transcriptUrl: text("transcript_url"),
   recordingUrl: text("recording_url"),
   summary: text("summary"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const mediaUploads = pgTable("media_uploads", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  agentId: text("agent_id")
+    .notNull()
+    .references(() => agents.id, { onDelete: "cascade" }),
+  kind: mediaUploadKind("kind").notNull(),
+  status: mediaUploadStatus("status").notNull().default("pending"),
+  uploadToken: text("upload_token"),
+  mime: text("mime"),
+  sizeBytes: integer("size_bytes"),
+  durationSec: integer("duration_sec"),
+  width: integer("width"),
+  height: integer("height"),
+  originalName: text("original_name"),
+  storageKey: text("storage_key"),
+  url: text("url"),
+  error: text("error"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

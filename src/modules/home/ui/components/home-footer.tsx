@@ -13,8 +13,8 @@ export const HomeFooter = () => {
             {/* Company Info */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Image src="/logo.svg" alt="Meet AI Logo" width={32} height={32} />
-                <span className="text-xl font-semibold text-foreground">Meet AI</span>
+                <Image src="/logo.svg" alt="TalkAI Logo" width={32} height={32} />
+                <span className="text-xl font-semibold font-display text-foreground">TalkAI</span>
               </div>
               <p className="text-muted-foreground max-w-sm">
                 Create custom AI agents that handle customer conversations through video calls.
@@ -70,7 +70,7 @@ export const HomeFooter = () => {
         {/* Bottom Footer */}
         <div className="border-t border-border py-6">
           <div className="text-center text-sm text-muted-foreground">
-            © {currentYear} Meet AI. All rights reserved.
+            © {currentYear} TalkAI. All rights reserved.
           </div>
         </div>
       </div>

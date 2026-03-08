@@ -17,7 +17,7 @@ export default function TermsOfService() {
               Agreement to Terms
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              By accessing and using Meet AI&apos;s services, you agree to be
+              By accessing and using TalkAI&apos;s services, you agree to be
               bound by these Terms of Service and all applicable laws and
               regulations. If you do not agree with any of these terms, you are
               prohibited from using our services.
@@ -30,7 +30,7 @@ export default function TermsOfService() {
               Description of Service
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Meet AI provides an AI-powered video meeting platform that enables
+              TalkAI provides an AI-powered video meeting platform that enables
               users to:
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-2">
@@ -181,7 +181,7 @@ export default function TermsOfService() {
               Intellectual Property
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              The Meet AI platform, including software, algorithms, and user
+              The TalkAI platform, including software, algorithms, and user
               interface, is protected by intellectual property laws.
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-2">
@@ -215,7 +215,7 @@ export default function TermsOfService() {
               Limitation of Liability
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              To the maximum extent permitted by law, Meet AI shall not be
+              To the maximum extent permitted by law, TalkAI shall not be
               liable for any indirect, incidental, special, consequential, or
               punitive damages, including but not limited to loss of profits,
               data, use, or other intangible losses resulting from your use of

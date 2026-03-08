@@ -3,9 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { BotIcon, StarIcon, VideoIcon } from "lucide-react";
+import { BotIcon, SettingsIcon, StarIcon, VideoIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import {
   Sidebar,
   SidebarContent,
@@ -36,6 +35,11 @@ const firstSection = [
 
 const secondSection = [
   {
+    icon: SettingsIcon,
+    label: "Settings",
+    url: "/settings",
+  },
+  {
     icon: StarIcon,
     label: "Upgrade",
     url: "/upgrade",
@@ -50,14 +54,21 @@ export function DashboardSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="text-sidebar-accent-foreground">
-        <Link href={"/"} className="flex items-center gap-2 px-2 pt-2">
-          <Image src={"/logo.svg"} alt="Meet AI logo" width={36} height={36} />
-          <p className="text-2xl font-semibold">Meet AI</p>
+      <SidebarHeader className="text-sidebar-foreground px-3 py-4">
+        <Link href={"/"} className="flex items-center gap-3 px-2">
+          <Image src={"/logo.svg"} alt="TalkAI logo" width={32} height={32} />
+          <div className="flex flex-col">
+            <p className="text-lg font-semibold font-display tracking-tight">
+              TalkAI
+            </p>
+            <span className="text-xs text-sidebar-foreground/70">
+              Intelligent meetings
+            </span>
+          </div>
         </Link>
       </SidebarHeader>
       <div className="px-4 py-2">
-        <Separator className="opacity-10 text-gray-300" />
+        <Separator className="opacity-20 bg-sidebar-border" />
       </div>
       <SidebarContent>
         <SidebarGroup>
@@ -69,10 +80,7 @@ export function DashboardSidebar() {
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton
                       asChild
-                      className={cn(
-                        "h-10 hover:bg-linear-to-r/oklch border border-transparent hover:border-[#5D6B68]/10 from-sidebar-accent from-5% via-30% via-sidebar/50 to-sidebar/50",
-                        isActive && "bg-linear-to-r/oklch border-[#5D6B68]/10"
-                      )}
+                      className="h-10 px-3"
                       isActive={isActive}
                     >
                       <Link href={item.url}>
@@ -89,7 +97,7 @@ export function DashboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <div className="px-4 py-2">
-          <Separator className="opacity-10 text-gray-300" />
+          <Separator className="opacity-20 bg-sidebar-border" />
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -100,10 +108,7 @@ export function DashboardSidebar() {
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton
                       asChild
-                      className={cn(
-                        "h-10 hover:bg-linear-to-r/oklch border border-transparent hover:border-[#5D6B68]/10 from-sidebar-accent from-5% via-30% via-sidebar/50 to-sidebar/50",
-                        isActive && "bg-linear-to-r/oklch border-[#5D6B68]/10"
-                      )}
+                      className="h-10 px-3"
                       isActive={isActive}
                     >
                       <Link href={item.url}>
@@ -120,7 +125,7 @@ export function DashboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="text-white">
+      <SidebarFooter className="text-sidebar-foreground">
         <DashboardTrial />
         <DashboardUserButton />
       </SidebarFooter>

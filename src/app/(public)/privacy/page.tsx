@@ -17,7 +17,7 @@ export default function PrivacyPolicy() {
               Introduction
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Meet AI ("we," "our," or "us") is committed to protecting your
+              TalkAI ("we," "our," or "us") is committed to protecting your
               privacy. This Privacy Policy explains how we collect, use,
               disclose, and safeguard your information when you use our
               AI-powered video meeting platform and services.

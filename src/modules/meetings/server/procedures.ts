@@ -30,6 +30,7 @@ import { streamVideo } from "@/lib/stream-video";
 import { generateAvatarUri } from "@/lib/avatar";
 import { meetingsInsertSchema, meetingsUpdateSchema } from "../schemas";
 import { streamChat } from "@/lib/stream-chat";
+import { resolveAgentAvatar } from "@/modules/agents/engines/avatar-engine";
 
 export const meetingsRouter = createTRPCRouter({
   generateChatToken: protectedProcedure.mutation(async ({ ctx }) => {
@@ -231,15 +232,22 @@ export const meetingsRouter = createTRPCRouter({
           message: "Agent not found!",
         });
 
+      const resolvedAvatar = resolveAgentAvatar({
+        id: existingAgent.id,
+        name: existingAgent.name,
+        faceThumbnailUrl: existingAgent.faceThumbnailUrl,
+        faceImageUrl: existingAgent.faceImageUrl,
+        faceVideoUrl: existingAgent.faceVideoUrl,
+        faceAnimationMode: existingAgent.faceAnimationMode,
+        faceProcessingStatus: existingAgent.faceProcessingStatus,
+      });
+
       await streamVideo.upsertUsers([
         {
           id: existingAgent.id,
           name: existingAgent.name,
           role: "user",
-          image: generateAvatarUri({
-            seed: existingAgent.id,
-            variant: "botttsNeutral",
-          }),
+          image: resolvedAvatar.imageUrl,
         },
       ]);
 

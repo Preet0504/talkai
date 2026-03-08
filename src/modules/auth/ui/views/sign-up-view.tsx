@@ -116,20 +116,20 @@ export const SignUpView = () => {
                 <div className="flex md:hidden flex-col items-center justify-center gap-2 mb-4">
                   <Image
                     src="/logo.svg"
-                    alt="Meet AI Logo"
+                    alt="TalkAI Logo"
                     className="h-[60px] w-[60px]"
                     width={60}
                     height={60}
                   />
                   <p className="text-xl font-semibold text-green-700">
-                    Meet AI
+                    TalkAI
                   </p>
                 </div>
 
                 <div className="flex flex-col items-center text-center">
                   <h1 className="text-2xl font-bold">Create your account</h1>
                   <p className="text-balance text-muted-foreground">
-                    Join Meet AI and start building AI agents
+                    Join TalkAI and start building AI agents
                   </p>
                 </div>
 
@@ -342,12 +342,12 @@ export const SignUpView = () => {
           <div className="bg-gradient-to-br from-sidebar-accent to-sidebar relative hidden md:flex flex-col items-center justify-center gap-y-4">
             <Image
               src="/logo.svg"
-              alt="Meet AI Logo"
+              alt="TalkAI Logo"
               className="h-[92px] w-[92px]"
               width={92}
               height={92}
             />
-            <p className="text-2xl font-semibold text-white">Meet AI</p>
+            <p className="text-2xl font-semibold text-white">TalkAI</p>
           </div>
         </CardContent>
       </Card>

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { and, count, desc, eq, getTableColumns, ilike } from "drizzle-orm";
 
 import { db } from "@/db";
-import { agents, meetings } from "@/db/schema";
+import { agents, meetings, userPreferences } from "@/db/schema";
 import { agentsInsertSchema, agentsUpdateSchema } from "../schemas";
 import {
   createTRPCRouter,
@@ -16,6 +16,56 @@ import {
   MIN_PAGE_SIZE,
 } from "@/constants";
 import { TRPCError } from "@trpc/server";
+import { MEDIA_LIMITS, VOICE_SAMPLE_MIME_ALLOWLIST } from "@/modules/media/constants";
+
+const validateAgentMediaInput = (
+  input: Partial<z.infer<typeof agentsInsertSchema>>
+) => {
+  if (
+    input.sampleAudioDurationSec &&
+    input.sampleAudioDurationSec > MEDIA_LIMITS.voice.maxDurationSec
+  ) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Voice sample must be 3 minutes or less.",
+    });
+  }
+
+  if (
+    input.sampleAudioMime &&
+    !VOICE_SAMPLE_MIME_ALLOWLIST.has(input.sampleAudioMime)
+  ) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Unsupported audio format for voice samples.",
+    });
+  }
+
+  if (
+    (input.sampleAudioUrl || input.faceImageUrl || input.faceVideoUrl) &&
+    input.consentAccepted !== true
+  ) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Consent is required before uploading media assets.",
+    });
+  }
+
+  if ((input.faceImageUrl || input.faceVideoUrl) && !input.faceSourceType) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Face source type is required for face assets.",
+    });
+  }
+};
+
+const hasMediaPayload = (input: Partial<z.infer<typeof agentsInsertSchema>>) => {
+  return Boolean(
+    input.sampleAudioUrl ||
+      input.faceImageUrl ||
+      input.faceVideoUrl
+  );
+};
 
 export const agentsRouter = createTRPCRouter({
   getOne: protectedProcedure
@@ -88,9 +138,27 @@ export const agentsRouter = createTRPCRouter({
   create: premiumProcedure("agents")
     .input(agentsInsertSchema)
     .mutation(async ({ input, ctx }) => {
+      if (hasMediaPayload(input)) {
+        const [preferences] = await db
+          .select()
+          .from(userPreferences)
+          .where(eq(userPreferences.userId, ctx.auth.user.id));
+
+        if (!preferences?.mediaFeaturesEnabled) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Agent media features are disabled for this account.",
+          });
+        }
+      }
+      validateAgentMediaInput(input);
       const [createdAgent] = await db
         .insert(agents)
-        .values({ ...input, userId: ctx.auth.user.id })
+        .values({
+          ...input,
+          consentAccepted: input.consentAccepted ?? false,
+          userId: ctx.auth.user.id,
+        })
         .returning();
 
       return createdAgent;
@@ -100,10 +168,28 @@ export const agentsRouter = createTRPCRouter({
     .input(agentsUpdateSchema)
     .mutation(async ({ input, ctx }) => {
       const { id, ...updateData } = input;
+      if (hasMediaPayload(updateData)) {
+        const [preferences] = await db
+          .select()
+          .from(userPreferences)
+          .where(eq(userPreferences.userId, ctx.auth.user.id));
+
+        if (!preferences?.mediaFeaturesEnabled) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Agent media features are disabled for this account.",
+          });
+        }
+      }
+      validateAgentMediaInput(updateData);
 
       const [updatedAgent] = await db
         .update(agents)
-        .set(updateData)
+        .set({
+          ...updateData,
+          consentAccepted: updateData.consentAccepted ?? undefined,
+          updatedAt: new Date(),
+        })
         .where(and(eq(agents.id, id), eq(agents.userId, ctx.auth.user.id)))
         .returning();
 

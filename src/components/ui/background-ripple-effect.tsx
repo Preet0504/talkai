@@ -31,7 +31,7 @@ export const BackgroundRippleEffect = ({
         <div className="pointer-events-none absolute inset-0 z-[2] h-full w-full overflow-hidden" />
         <DivGrid
           key={`base-${rippleKey}`}
-          className="mask-radial-from-20% mask-radial-at-top opacity-600"
+          className="mask-radial-from-20% mask-radial-at-top opacity-60"
           rows={rows}
           cols={cols}
           cellSize={cellSize}

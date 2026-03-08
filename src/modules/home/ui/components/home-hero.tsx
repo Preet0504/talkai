@@ -16,11 +16,11 @@ export const HomeHero = () => {
           <div className="mb-8">
             <span className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
               <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-              Meet AI is now live
+              TalkAI is now live
             </span>
           </div>
 
-          <h1 className="text-5xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
+          <h1 className="text-5xl lg:text-7xl font-bold font-display text-foreground mb-6 leading-tight">
             Create AI agents for
             <span className="text-primary"> customer conversations</span>
           </h1>
@@ -30,14 +30,23 @@ export const HomeHero = () => {
             and specialized conversations through video calls.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Button size="lg" className="text-lg px-8 py-4 rounded-xl shadow-lg" asChild>
+          <div className="flex flex-col items-center sm:flex-row gap-4 justify-center mb-16">
+            <Button
+              size="lg"
+              className="w-full sm:w-auto text-lg px-8 py-4 rounded-xl shadow-lg"
+              asChild
+            >
               <Link href="/sign-up">
                 Start free trial
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-4 rounded-xl" asChild>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto text-lg px-8 py-4 rounded-xl"
+              asChild
+            >
               <Link href="/sign-in">
                 Watch demo
               </Link>
@@ -52,13 +61,13 @@ export const HomeHero = () => {
                   <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                   <div className="w-3 h-3 bg-primary rounded-full"></div>
-                  <span className="text-sm text-muted-foreground ml-4">Meet AI Dashboard</span>
+                  <span className="text-sm text-muted-foreground ml-4">TalkAI Dashboard</span>
                 </div>
               </div>
               <div className="relative">
                 <Image
                   src="/dashboard.png"
-                  alt="Meet AI Dashboard Preview"
+                  alt="TalkAI Dashboard Preview"
                   width={1200}
                   height={800}
                   className="w-full h-auto"

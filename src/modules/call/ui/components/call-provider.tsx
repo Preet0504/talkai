@@ -8,9 +8,18 @@ import { generateAvatarUri } from "@/lib/avatar";
 interface Props {
   meetingId: string;
   meetingName: string;
+  agent?: {
+    id: string;
+    name: string;
+    faceThumbnailUrl?: string | null;
+    faceImageUrl?: string | null;
+    faceVideoUrl?: string | null;
+    faceAnimationMode?: string | null;
+    faceProcessingStatus?: string | null;
+  };
 }
 
-export const CallProvider = ({ meetingId, meetingName }: Props) => {
+export const CallProvider = ({ meetingId, meetingName, agent }: Props) => {
   const { data, isPending } = authClient.useSession();
 
   if (!data || isPending) {
@@ -25,6 +34,7 @@ export const CallProvider = ({ meetingId, meetingName }: Props) => {
     <CallConnect
       meetingId={meetingId}
       meetingName={meetingName}
+      agent={agent}
       userId={data.user.id}
       userName={data.user.name}
       userImage={

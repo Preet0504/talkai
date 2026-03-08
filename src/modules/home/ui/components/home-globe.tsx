@@ -13,7 +13,7 @@ export const HomeGlobe = () => {
             <span className="text-primary"> worldwide</span>
           </h2>
           <p className="text-xl text-muted-foreground mb-16 max-w-3xl mx-auto">
-            Join thousands of businesses already using Meet AI to deliver exceptional customer experiences
+            Join thousands of businesses already using TalkAI to deliver exceptional customer experiences
             across every timezone, in every language, 24/7.
           </p>
 
@@ -64,14 +64,23 @@ export const HomeGlobe = () => {
               Create your first AI agent in minutes. No credit card required.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Button size="lg" className="text-lg px-10 py-4 rounded-xl shadow-lg" asChild>
+            <div className="flex flex-col items-center sm:flex-row gap-4 justify-center mb-8">
+              <Button
+                size="lg"
+                className="w-full sm:w-auto text-lg px-10 py-4 rounded-xl shadow-lg"
+                asChild
+              >
                 <Link href="/sign-up">
                   Start building now
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-10 py-4 rounded-xl" asChild>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto text-lg px-10 py-4 rounded-xl"
+                asChild
+              >
                 <Link href="/sign-in">
                   See live demo
                 </Link>

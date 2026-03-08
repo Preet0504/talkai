@@ -29,7 +29,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-background">
+    <div className="overflow-hidden rounded-lg border border-border/60 bg-card shadow-elevated">
       <Table>
         <TableBody>
           {table.getRowModel().rows?.length ? (
@@ -38,7 +38,7 @@ export function DataTable<TData, TValue>({
                 onClick={() => onRowClick?.(row.original)}
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="cursor-pointer"
+                className="cursor-pointer hover:bg-muted/40 transition-colors"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="text-sm p-4">
@@ -47,35 +47,21 @@ export function DataTable<TData, TValue>({
                 ))}
               </TableRow>
             ))
+          ) : emptyStateComponent ? (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="p-0">
+                {emptyStateComponent}
+              </TableCell>
+            </TableRow>
           ) : (
-            <>
-              {emptyStateComponent ? (
-                <>
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-19 text-muted-foreground text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="p-0">
-                      {emptyStateComponent}
-                    </TableCell>
-                  </TableRow>
-                </>
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-19 text-muted-foreground text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </>
+            <TableRow>
+              <TableCell
+                colSpan={columns.length}
+                className="h-19 text-muted-foreground text-center"
+              >
+                No results.
+              </TableCell>
+            </TableRow>
           )}
         </TableBody>
       </Table>
