@@ -6,7 +6,7 @@ import { nanoid } from "nanoid";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { db } from "@/db";
 import { agents, mediaUploads, userPreferences } from "@/db/schema";
-import { validateMediaMeta } from "./validation";
+import { normalizeMime, validateMediaMeta } from "./validation";
 import { deleteMediaFile } from "@/lib/media-storage";
 import { MEDIA_LIMITS, type MediaUploadKind } from "../constants";
 
@@ -85,9 +85,10 @@ export const mediaRouter = createTRPCRouter({
         });
       }
 
+      const normalizedMime = normalizeMime(input.mime);
       const validation = validateMediaMeta({
         kind: input.kind,
-        mime: input.mime,
+        mime: normalizedMime,
         sizeBytes: input.sizeBytes,
         durationSec: input.durationSec,
         width: input.width,
@@ -119,7 +120,7 @@ export const mediaRouter = createTRPCRouter({
           kind: input.kind,
           status: "pending",
           uploadToken,
-          mime: input.mime,
+          mime: normalizedMime,
           sizeBytes: input.sizeBytes,
           durationSec: input.durationSec ?? null,
           width: input.width ?? null,

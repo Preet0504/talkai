@@ -6,7 +6,7 @@ import { agents, mediaUploads } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { getExtensionForMime } from "@/lib/media-utils";
 import { createStorageKey, deleteMediaFile, saveMediaFile } from "@/lib/media-storage";
-import { validateMediaMeta } from "@/modules/media/server/validation";
+import { normalizeMime, validateMediaMeta } from "@/modules/media/server/validation";
 import { inngest } from "@/inngest/client";
 
 export const runtime = "nodejs";
@@ -64,9 +64,11 @@ export async function PUT(req: NextRequest, { params }: Params) {
     );
   }
 
-  const mime = req.headers.get("content-type") ?? upload.mime ?? "";
+  const rawMime = req.headers.get("content-type") ?? upload.mime ?? "";
+  const mime = normalizeMime(rawMime);
 
-  if (upload.mime && mime && upload.mime !== mime) {
+  const expectedMime = normalizeMime(upload.mime);
+  if (expectedMime && mime && expectedMime !== mime) {
     await db
       .update(mediaUploads)
       .set({
@@ -218,6 +220,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
       uploadId,
     });
   } catch (error) {
+    console.error("media.upload.failed", { uploadId, error });
     await db
       .update(mediaUploads)
       .set({

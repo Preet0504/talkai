@@ -20,8 +20,11 @@ export interface MediaValidationResult {
   message?: string;
 }
 
+export const normalizeMime = (value: string | null | undefined) =>
+  (value ?? "").split(";")[0].trim().toLowerCase();
+
 export const validateMediaMeta = (input: MediaMetaInput): MediaValidationResult => {
-  const mime = input.mime ?? "";
+  const mime = normalizeMime(input.mime);
   if (!mime) {
     return { ok: false, message: "Missing file type." };
   }
