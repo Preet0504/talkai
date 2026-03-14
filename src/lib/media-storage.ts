@@ -13,6 +13,8 @@ export const MEDIA_ROOT =
   process.env.MEDIA_UPLOAD_DIR ?? DEFAULT_MEDIA_ROOT;
 
 const isBlobStorageEnabled = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+const configuredBlobAccess = process.env.BLOB_OBJECT_ACCESS?.trim().toLowerCase();
+const blobAccess = configuredBlobAccess === "private" ? "private" : "public";
 
 export const getStoragePath = (storageKey: string) => {
   return path.join(MEDIA_ROOT, storageKey);
@@ -37,7 +39,7 @@ export const ensureStorageDir = async (storageKey: string) => {
 export const saveMediaFile = async (storageKey: string, data: Uint8Array) => {
   if (isBlobStorageEnabled) {
     const uploaded = await put(storageKey, Buffer.from(data), {
-      access: "public",
+      access: blobAccess,
       addRandomSuffix: false,
     });
 

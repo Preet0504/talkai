@@ -142,7 +142,16 @@ export async function PUT(req: NextRequest, { params }: Params) {
           .from(mediaUploads)
           .where(eq(mediaUploads.url, url));
         if (previous?.storageKey) {
-          await deleteMediaFile(previous.storageKey);
+          try {
+            await deleteMediaFile(previous.storageKey);
+          } catch (cleanupError) {
+            console.error("media.upload.cleanup_failed", {
+              uploadId,
+              previousUploadId: previous.id,
+              storageKey: previous.storageKey,
+              cleanupError,
+            });
+          }
         }
         if (previous) {
           await db
