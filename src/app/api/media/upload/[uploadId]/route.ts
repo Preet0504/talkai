@@ -111,8 +111,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
   try {
     const extension = getExtensionForMime(mime);
     const storageKey = createStorageKey(upload.agentId, uploadId, extension);
-    await saveMediaFile(storageKey, data);
-    const fileUrl = `/api/media/file/${uploadId}`;
+    const storedMedia = await saveMediaFile(storageKey, data);
+    const fileUrl = storedMedia.url ?? `/api/media/file/${uploadId}`;
 
     await db
       .update(mediaUploads)
@@ -121,7 +121,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
         uploadToken: null,
         mime,
         sizeBytes,
-        storageKey,
+        storageKey: storedMedia.storageKey,
         url: fileUrl,
         updatedAt: new Date(),
       })
@@ -203,7 +203,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
           })
           .where(eq(agents.id, upload.agentId));
       }
+    }
 
+    try {
       await inngest.send({
         name: "agents/media.process",
         data: {
@@ -212,6 +214,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
           kind: upload.kind,
         },
       });
+    } catch (error) {
+      console.error("media.upload.inngest_failed", { uploadId, error });
     }
 
     return NextResponse.json({
