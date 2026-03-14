@@ -36,7 +36,7 @@ export const ensureStorageDir = async (storageKey: string) => {
 
 export const saveMediaFile = async (storageKey: string, data: Uint8Array) => {
   if (isBlobStorageEnabled) {
-    const uploaded = await put(storageKey, data, {
+    const uploaded = await put(storageKey, Buffer.from(data), {
       access: "public",
       addRandomSuffix: false,
     });
