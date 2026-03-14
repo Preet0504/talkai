@@ -207,6 +207,7 @@ export async function POST(req: NextRequest) {
     const userId = event.user?.id;
     const channelId = event.channel_id;
     const text = event.message?.text;
+    const incomingMessageId = event.message?.id;
 
     if (!userId || !channelId || !text) {
       return NextResponse.json(
@@ -259,8 +260,20 @@ export async function POST(req: NextRequest) {
       const channel = streamChat.channel("messaging", channelId);
       await channel.watch();
 
+      const responseMessageId = incomingMessageId
+        ? `ai-reply-${incomingMessageId}`
+        : undefined;
+
+      if (
+        responseMessageId &&
+        channel.state.messages.some((message) => message.id === responseMessageId)
+      ) {
+        return NextResponse.json({ status: "ok" });
+      }
+
       const previousMessages = channel.state.messages
         .slice(-5)
+        .filter((message) => message.id !== incomingMessageId)
         .filter((msg) => msg.text && msg.text.trim() !== "")
         .map<ChatCompletionMessageParam>((message) => ({
           role: message.user?.id === existingAgent.id ? "assistant" : "user",
@@ -290,13 +303,14 @@ export async function POST(req: NextRequest) {
         variant: "botttsNeutral",
       });
 
-      streamChat.upsertUser({
+      await streamChat.upsertUser({
         id: existingAgent.id,
         name: existingAgent.name,
         image: avatarUrl,
       });
 
-      channel.sendMessage({
+      await channel.sendMessage({
+        id: responseMessageId,
         text: GPTResponseText,
         user: {
           id: existingAgent.id,

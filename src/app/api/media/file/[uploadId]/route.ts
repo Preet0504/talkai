@@ -3,11 +3,15 @@ import { createReadStream } from "fs";
 import { stat } from "fs/promises";
 import { Readable } from "stream";
 import { and, eq } from "drizzle-orm";
+import { get as getBlob } from "@vercel/blob";
 
 import { db } from "@/db";
 import { mediaUploads } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { getStoragePath } from "@/lib/media-storage";
+import {
+  getBlobAccessMode,
+  getStoragePath,
+} from "@/lib/media-storage";
 
 export const runtime = "nodejs";
 
@@ -47,6 +51,48 @@ export async function GET(req: NextRequest, { params }: Params) {
       { error: "Media asset not found." },
       { status: 404 }
     );
+  }
+
+  const isBlobStorageKey =
+    upload.storageKey.startsWith("http://") ||
+    upload.storageKey.startsWith("https://");
+
+  if (isBlobStorageKey) {
+    const range = req.headers.get("range");
+    const accessMode = getBlobAccessMode();
+    const blobResult = await getBlob(upload.storageKey, {
+      access: accessMode,
+      useCache: accessMode === "public",
+      headers: range ? { Range: range } : undefined,
+    });
+
+    if (!blobResult || !blobResult.stream) {
+      return NextResponse.json(
+        { error: "Media asset not found." },
+        { status: 404 }
+      );
+    }
+
+    const responseHeaders = new Headers();
+    const contentType =
+      blobResult.blob.contentType ?? upload.mime ?? "application/octet-stream";
+    responseHeaders.set("Content-Type", contentType);
+
+    const contentLength = blobResult.headers.get("content-length");
+    if (contentLength) responseHeaders.set("Content-Length", contentLength);
+
+    const contentRange = blobResult.headers.get("content-range");
+    if (contentRange) responseHeaders.set("Content-Range", contentRange);
+
+    const acceptRanges = blobResult.headers.get("accept-ranges");
+    if (acceptRanges) responseHeaders.set("Accept-Ranges", acceptRanges);
+
+    responseHeaders.set("Cache-Control", "private, max-age=600");
+
+    return new NextResponse(blobResult.stream, {
+      status: contentRange ? 206 : 200,
+      headers: responseHeaders,
+    });
   }
 
   const filePath = getStoragePath(upload.storageKey);

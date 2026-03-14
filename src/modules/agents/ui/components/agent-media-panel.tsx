@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import Image from "next/image";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Loader2, Mic, Square, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -576,11 +575,10 @@ export const AgentMediaPanel = ({
           <div className="space-y-3">
             <AspectRatio ratio={16 / 9}>
               {agent.faceImageUrl ? (
-                <Image
+                <img
                   src={agent.faceImageUrl}
                   alt="Agent portrait"
-                  fill
-                  className="rounded-lg object-cover"
+                  className="h-full w-full rounded-lg object-cover"
                 />
               ) : (
                 <video
@@ -604,11 +602,10 @@ export const AgentMediaPanel = ({
                   controls
                 />
               ) : (
-                <Image
+                <img
                   src={uploadState.previewUrl}
                   alt="Face preview"
-                  fill
-                  className="rounded-lg object-cover"
+                  className="h-full w-full rounded-lg object-cover"
                 />
               )}
             </AspectRatio>

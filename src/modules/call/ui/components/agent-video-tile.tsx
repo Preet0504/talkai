@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo } from "react";
 import { useCallStateHooks } from "@stream-io/video-react-sdk";
 
@@ -43,11 +42,9 @@ export const AgentVideoTile = ({ agent }: AgentVideoTileProps) => {
   return (
     <div className="rounded-2xl border border-border/60 bg-card/70 p-3 shadow-sm backdrop-blur">
       <div className="relative overflow-hidden rounded-xl">
-        <Image
+        <img
           src={resolvedAvatar.imageUrl}
           alt={`${agent.name} avatar`}
-          width={320}
-          height={180}
           className="h-32 w-full object-cover"
         />
         {isSpeaking && (

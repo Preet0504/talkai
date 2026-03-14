@@ -9,7 +9,6 @@ import {
   Channel,
   MessageInput,
   MessageList,
-  Thread,
   Window,
 } from "stream-chat-react";
 import { useTRPC } from "@/trpc/client";
@@ -81,13 +80,11 @@ export const ChatUI = ({
     );
 
   return (
-    <div className="bg-card rounded-lg border border-border/60 overflow-hidden shadow-elevated">
+    <div className="bg-card rounded-lg border border-border/60 overflow-hidden shadow-elevated h-[min(70vh,640px)] [&_.str-chat]:h-full [&_.str-chat__container]:h-full [&_.str-chat__main-panel]:h-full [&_.str-chat__main-panel]:flex [&_.str-chat__main-panel]:flex-col [&_.str-chat__list]:min-h-0 [&_.str-chat__message-list-scroll]:max-h-none">
       <Chat client={client}>
         <Channel channel={channel}>
           <Window>
-            <div className="flex-1 overflow-y-auto max-h-[calc(100vh-23rem)] border-b">
-              <MessageList />
-            </div>
+            <MessageList />
             <MessageInput />
           </Window>
         </Channel>

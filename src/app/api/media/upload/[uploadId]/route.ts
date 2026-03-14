@@ -5,7 +5,12 @@ import { db } from "@/db";
 import { agents, mediaUploads } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { getExtensionForMime } from "@/lib/media-utils";
-import { createStorageKey, deleteMediaFile, saveMediaFile } from "@/lib/media-storage";
+import {
+  createStorageKey,
+  deleteMediaFile,
+  resolveMediaDeliveryUrl,
+  saveMediaFile,
+} from "@/lib/media-storage";
 import { normalizeMime, validateMediaMeta } from "@/modules/media/server/validation";
 import { inngest } from "@/inngest/client";
 
@@ -112,7 +117,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const extension = getExtensionForMime(mime);
     const storageKey = createStorageKey(upload.agentId, uploadId, extension);
     const storedMedia = await saveMediaFile(storageKey, data);
-    const fileUrl = storedMedia.url ?? `/api/media/file/${uploadId}`;
+    const fileUrl = resolveMediaDeliveryUrl(uploadId, storedMedia.url);
 
     await db
       .update(mediaUploads)

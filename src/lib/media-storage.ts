@@ -16,6 +16,9 @@ const isBlobStorageEnabled = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 const configuredBlobAccess = process.env.BLOB_OBJECT_ACCESS?.trim().toLowerCase();
 const blobAccess = configuredBlobAccess === "private" ? "private" : "public";
 
+export const isPrivateBlobAccess =
+  isBlobStorageEnabled && blobAccess === "private";
+
 export const getStoragePath = (storageKey: string) => {
   return path.join(MEDIA_ROOT, storageKey);
 };
@@ -55,6 +58,19 @@ export const saveMediaFile = async (storageKey: string, data: Uint8Array) => {
     storageKey,
     url: null,
   };
+};
+
+export const getBlobAccessMode = () => blobAccess;
+
+export const resolveMediaDeliveryUrl = (
+  uploadId: string,
+  blobUrl: string | null
+) => {
+  if (blobUrl && !isPrivateBlobAccess) {
+    return blobUrl;
+  }
+
+  return `/api/media/file/${uploadId}`;
 };
 
 export const getMediaFileSize = async (storageKey: string) => {
